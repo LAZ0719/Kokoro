@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/LAZ0719/Kokoro/issues"
   },
-  "homepage": "https://github.com/LAZ0719/Kokoro#readme"
+  "homepage": "https://github.com/LAZ0719/Kokoro#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
