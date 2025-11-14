@@ -5,20 +5,19 @@ const PORT = 3000;
 app.use(express.static('public'));
 app.use(express.json());
 
-let tasks = [];  // simple in-memory task store
+let tasks = [];
 
 app.get('/tasks', (req, res) => {
   res.json(tasks);
 });
 
 app.post('/tasks', (req, res) => {
-  const task = req.body.task;
-  if (task) {
-    tasks.push(task);
-    res.status(201).json({ message: 'Task added' });
-  } else {
-    res.status(400).json({ message: 'Task content missing' });
+  const { task } = req.body;
+  if (!task) {
+    return res.status(400).json({ error: 'Task is required' });
   }
+  tasks.push(task);
+  res.status(201).json({ message: 'Task added' });
 });
 
 app.listen(PORT, () => {
