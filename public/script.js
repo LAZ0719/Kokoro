@@ -1,43 +1,37 @@
-const taskInput = document.getElementById("task-input");
-const addTaskBtn = document.getElementById("add-task-btn");
-const taskList = document.getElementById("task-list");
+const form = document.querySelector('form');
+const input = document.querySelector('input');
+const taskList = document.createElement('ul');
+document.body.appendChild(taskList);
 
-// Fetch tasks from backend
-async function fetchTasks() {
-  const res = await fetch("/tasks");
-  const tasks = await res.json();
-  taskList.innerHTML = "";
-  tasks.forEach(task => {
-    const li = document.createElement("li");
-    li.textContent = task.text;
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Delete";
-    delBtn.classList.add("delete-btn");
-    delBtn.onclick = () => deleteTask(task.id);
-    li.appendChild(delBtn);
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const task = input.value.trim();
+  if (!task) return;
+
+  // Send task to server
+  const response = await fetch('/tasks', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ task }),
+  });
+
+  if (response.ok) {
+    input.value = '';
+    loadTasks();
+  } else {
+    alert('Failed to add task');
+  }
+});
+
+async function loadTasks() {
+  const response = await fetch('/tasks');
+  const tasks = await response.json();
+  taskList.innerHTML = '';
+  tasks.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
     taskList.appendChild(li);
   });
 }
 
-// Add new task
-addTaskBtn.onclick = async () => {
-  const text = taskInput.value.trim();
-  if (!text) return alert("Please enter a task!");
-  const newTask = { id: Date.now().toString(), text };
-  await fetch("/tasks", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newTask),
-  });
-  taskInput.value = "";
-  fetchTasks();
-};
-
-// Delete task
-async function deleteTask(id) {
-  await fetch(`/tasks/${id}`, { method: "DELETE" });
-  fetchTasks();
-}
-
-// Initial fetch
-fetchTasks();
+loadTasks();
